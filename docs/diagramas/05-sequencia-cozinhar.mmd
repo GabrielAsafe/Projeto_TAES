@@ -1,0 +1,36 @@
+sequenceDiagram
+    actor U as Utilizador
+    participant UI as UI receitas/Cook Mode
+    participant P as Perfil ativo
+    participant R as Motor de receitas
+    participant I as Inventário
+    participant B as Livro de receitas
+    participant DB as Base local
+    U->>UI: Pesquisar receitas
+    UI->>P: Ler porções/restrições
+    UI->>I: Ler stock e validades
+    UI->>R: Pesquisar + adaptar + filtrar + classificar
+    R-->>UI: Receitas compatíveis com percentagem/faltas
+    U->>UI: Escolher receita e iniciar Cook Mode
+    loop Cada passo
+        UI-->>U: Passo, ingredientes usados e temporizador
+        U->>UI: Próximo passo / controlar timer
+    end
+    U->>UI: Concluir receita
+    UI-->>U: Resumo de consumo por ingrediente
+    U->>UI: Ajustar quantidades e confirmar
+    alt Descontar stock
+        UI->>I: Validar unidades, lotes e quantidades
+        I->>DB: Transação atómica de consumo
+        DB-->>I: Stock atualizado
+    else Ignorar desconto
+        UI-->>U: Stock permanece inalterado
+    end
+    UI->>B: Registar conclusão / incremento de contador
+    B->>DB: Guardar registo de preparação
+    opt Receita ainda não guardada e utilizador aceita
+        U->>UI: Guardar receita
+        UI->>B: Guardar snapshot, se permitido pela fonte
+        B->>DB: Persistir receita e bookmark
+    end
+    UI-->>U: Conclusão confirmada

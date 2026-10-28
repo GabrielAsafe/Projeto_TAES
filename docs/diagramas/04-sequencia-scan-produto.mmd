@@ -1,0 +1,26 @@
+sequenceDiagram
+    actor U as Utilizador
+    participant UI as Modal da despensa
+    participant S as Leitor de barcode
+    participant API as API produtos
+    participant DB as Persistência local
+    U->>UI: Escolher leitura por câmara
+    UI->>S: Solicitar leitura
+    alt Câmara disponível e código lido
+        S-->>UI: Código de barras
+        UI->>API: Consultar produto(código)
+        alt Produto encontrado e campos válidos
+            API-->>UI: Nome, categoria, tamanho/unidade
+            UI-->>U: Pré-preencher e permitir editar
+        else Produto em falta, API falhou, ou campos insuficientes
+            API-->>UI: Sem dados utilizáveis
+            UI-->>U: Oferecer upload da imagem ou inserção manual
+        end
+    else Câmara não autorizada, indisponível ou falha de leitura
+        S-->>UI: Falha ou indisponibilidade
+        UI-->>U: Oferecer upload da imagem ou inserção manual
+    end
+    U->>UI: Confirmar nome, quantidade, unidade, categoria, validade
+    UI->>DB: Guardar item/lote
+    DB-->>UI: Item guardado
+    UI-->>U: Atualizar despensa e alertas

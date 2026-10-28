@@ -1,0 +1,32 @@
+flowchart TB
+  subgraph DEV[Dispositivo móvel]
+    UI[Interface mobile-first]
+    subgraph APP[Aplicação modular]
+      PROF[Perfis e restrições]
+      PAN[Despensa e categorias]
+      SHOP[Compras]
+      REC[Receitas e correspondência]
+      COOK[Cook Mode e conclusão]
+      PORT[Exportação / importação]
+      ADAP[Adaptadores para integrações]
+    end
+    DB[(Persistência local)]
+    CAMERA[Câmara / ficheiros / temporizadores]
+  end
+  OFF[Open Food Facts]
+  RECAPI[Fornecedor de receitas]
+  AI[Fornecedor GenAI]
+  SEC[Camada de proteção de credenciais, se necessária]
+  UI --> PROF & PAN & SHOP & REC & COOK & PORT
+  UI --> CAMERA
+  PROF & PAN & SHOP & REC & COOK & PORT <--> DB
+  PAN --> ADAP
+  REC --> ADAP
+  ADAP --> OFF
+  ADAP --> RECAPI
+  ADAP -. credencial protegida .-> SEC
+  SEC -. opcional / a negociar .-> AI
+  ADAP -. opção sem segredos embebidos .-> AI
+  COOK --> PAN
+  COOK --> REC
+  SHOP --> PAN

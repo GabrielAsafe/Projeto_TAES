@@ -1,0 +1,108 @@
+classDiagram
+    direction LR
+    class AppSettings {
+      +UUID activeProfileId
+      +int exportSchemaVersion
+    }
+    class HouseholdProfile {
+      +UUID id
+      +string name
+      +int defaultServings
+    }
+    class ProfileRestriction {
+      +UUID id
+      +RestrictionKind kind
+      +string value
+    }
+    class PantryCategory {
+      +UUID id
+      +string name
+      +bool custom
+    }
+    class Ingredient {
+      +UUID id
+      +string canonicalName
+    }
+    class PantryItem {
+      +UUID id
+      +string displayName
+      +decimal quantity
+      +string unit
+      +date expiryDate
+      +string barcode
+    }
+    class ShoppingItem {
+      +UUID id
+      +string name
+      +decimal desiredQuantity
+      +string unit
+      +bool checked
+    }
+    class Recipe {
+      +UUID id
+      +RecipeSource source
+      +string externalId
+      +string title
+      +int servings
+      +int prepMinutes
+      +int cookMinutes
+    }
+    class RecipeIngredient {
+      +UUID id
+      +string displayName
+      +decimal quantity
+      +string unit
+    }
+    class RecipeStep {
+      +UUID id
+      +int position
+      +string instruction
+      +int timerSeconds
+    }
+    class StepIngredient {
+      +decimal quantity
+      +string unit
+    }
+    class SavedRecipe {
+      +UUID recipeId
+      +datetime savedAt
+    }
+    class RecipeFolder {
+      +UUID id
+      +string name
+    }
+    class RecipeCollection {
+      +UUID id
+      +string name
+    }
+    class CollectionMembership {
+      +UUID recipeId
+      +UUID collectionId
+    }
+    class CookingRecord {
+      +UUID id
+      +datetime completedAt
+      +string sourceRef
+      +bool stockDecremented
+    }
+    class ConsumptionLine {
+      +UUID id
+      +decimal quantity
+      +string unit
+    }
+    AppSettings "1" --> "1" HouseholdProfile : perfil ativo
+    HouseholdProfile "1" *-- "0..*" ProfileRestriction : restrições
+    PantryCategory "1" <-- "0..*" PantryItem : categoria
+    Ingredient "0..1" <-- "0..*" PantryItem : normalização opcional
+    Ingredient "0..1" <-- "0..*" RecipeIngredient : normalização opcional
+    Recipe "1" *-- "1..*" RecipeIngredient : ingredientes
+    Recipe "1" *-- "1..*" RecipeStep : passos
+    RecipeStep "1" *-- "0..*" StepIngredient : utiliza
+    StepIngredient "0..*" --> "1" RecipeIngredient : referência
+    Recipe "1" --> "0..1" SavedRecipe : bookmark
+    SavedRecipe "0..*" --> "0..1" RecipeFolder : pasta
+    SavedRecipe "1" --> "0..*" CollectionMembership : entradas
+    RecipeCollection "1" --> "0..*" CollectionMembership : entradas
+    CookingRecord "0..*" --> "0..1" Recipe : receita local
+    CookingRecord "1" *-- "0..*" ConsumptionLine : consumo confirmado
+    ConsumptionLine "0..*" --> "0..1" PantryItem : lote

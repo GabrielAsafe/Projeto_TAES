@@ -1,0 +1,129 @@
+erDiagram
+    APP_SETTINGS {
+      string id PK
+      string active_profile_id FK
+      int schema_version
+    }
+    HOUSEHOLD_PROFILE {
+      string id PK
+      string name
+      int default_servings
+    }
+    PROFILE_RESTRICTION {
+      string id PK
+      string profile_id FK
+      string kind
+      string value
+    }
+    PANTRY_CATEGORY {
+      string id PK
+      string name
+      boolean is_custom
+    }
+    INGREDIENT {
+      string id PK
+      string canonical_name
+    }
+    INGREDIENT_ALIAS {
+      string id PK
+      string ingredient_id FK
+      string alias
+    }
+    PANTRY_ITEM {
+      string id PK
+      string category_id FK
+      string ingredient_id FK
+      string display_name
+      decimal quantity
+      string unit
+      date expiry_date
+      string barcode
+    }
+    SHOPPING_ITEM {
+      string id PK
+      string ingredient_id FK
+      string name
+      decimal desired_quantity
+      string unit
+      boolean checked
+    }
+    RECIPE {
+      string id PK
+      string source
+      string external_id
+      string title
+      int servings
+      int prep_minutes
+      int cook_minutes
+    }
+    RECIPE_INGREDIENT {
+      string id PK
+      string recipe_id FK
+      string ingredient_id FK
+      string display_name
+      decimal quantity
+      string unit
+    }
+    RECIPE_STEP {
+      string id PK
+      string recipe_id FK
+      int position
+      string instruction
+      int timer_seconds
+    }
+    STEP_INGREDIENT {
+      string recipe_step_id FK
+      string recipe_ingredient_id FK
+      decimal quantity
+      string unit
+    }
+    SAVED_RECIPE {
+      string recipe_id PK,FK
+      string folder_id FK
+      datetime saved_at
+    }
+    RECIPE_FOLDER {
+      string id PK
+      string name
+    }
+    RECIPE_COLLECTION {
+      string id PK
+      string name
+    }
+    COLLECTION_MEMBERSHIP {
+      string collection_id PK,FK
+      string recipe_id PK,FK
+    }
+    COOKING_RECORD {
+      string id PK
+      string recipe_id FK
+      string source_ref
+      string title_snapshot
+      datetime completed_at
+      boolean stock_decremented
+    }
+    CONSUMPTION_LINE {
+      string id PK
+      string cooking_id FK
+      string pantry_item_id FK
+      decimal quantity
+      string unit
+    }
+    HOUSEHOLD_PROFILE ||--o{ PROFILE_RESTRICTION : tem
+    HOUSEHOLD_PROFILE ||--o| APP_SETTINGS : pode_ser_ativo
+    PANTRY_CATEGORY ||--o{ PANTRY_ITEM : categoriza
+    INGREDIENT ||--o{ INGREDIENT_ALIAS : nomes
+    INGREDIENT o|--o{ PANTRY_ITEM : corresponde
+    INGREDIENT o|--o{ RECIPE_INGREDIENT : corresponde
+    INGREDIENT o|--o{ SHOPPING_ITEM : corresponde
+    RECIPE ||--|{ RECIPE_INGREDIENT : contem
+    RECIPE ||--|{ RECIPE_STEP : contem
+    RECIPE_STEP ||--o{ STEP_INGREDIENT : utiliza
+    RECIPE_INGREDIENT ||--o{ STEP_INGREDIENT : indicado
+    RECIPE ||--o| SAVED_RECIPE : guardada
+    RECIPE_FOLDER o|--o{ SAVED_RECIPE : organiza
+    RECIPE_COLLECTION ||--o{ COLLECTION_MEMBERSHIP : inclui
+    SAVED_RECIPE ||--o{ COLLECTION_MEMBERSHIP : associada
+    RECIPE o|--o{ COOKING_RECORD : regista
+    COOKING_RECORD ||--o{ CONSUMPTION_LINE : consumo
+    PANTRY_ITEM o|--o{ CONSUMPTION_LINE : lote_consumido
